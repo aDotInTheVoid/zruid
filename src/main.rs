@@ -1,12 +1,14 @@
-use druid::widget::{Flex, Painter, Scroll, SizedBox, TextBox};
+use std::mem;
+
+use druid::im::{vector, Vector};
+use druid::widget::{Button, Flex, Label, List, Painter, Scroll, SizedBox, TextBox};
 use druid::{AppLauncher, Color, Data, Lens, RenderContext, Widget, WidgetExt, WindowDesc};
 
 #[derive(Clone, Data, Lens)]
 struct State {
-    to_send: String
+    to_send: String,
+    messages: Vector<String>,
 }
-
-
 
 fn main() {
     let main_window = WindowDesc::new(build_root_widget)
@@ -14,14 +16,13 @@ fn main() {
         .window_size((800.0, 400.0));
 
     let state = State {
-        to_send: String::new()
+        to_send: String::new(),
+        messages: vector![],
     };
-
 
     AppLauncher::with_window(main_window)
         .launch(state)
         .expect("Failed to launch");
-
 }
 
 fn build_root_widget() -> impl Widget<State> {
@@ -30,21 +31,26 @@ fn build_root_widget() -> impl Widget<State> {
         .with_child(SizedBox::new(rectangle(Color::BLUE)).width(200.0))
         .with_flex_child(
             Flex::column()
-                .with_flex_child(Scroll::new(messages()).vertical(), 1.0)
-                .with_child(SizedBox::new(TextBox::multiline().lens(State::to_send)).height(100.0).expand_width()),
+                .with_flex_child(
+                    Scroll::new(List::new(|| {
+                        Label::new(|a: &String, _: &_| a.to_owned()).expand_width()
+                    }))
+                    .vertical()
+                    .lens(State::messages),
+                    1.0,
+                )
+                .with_child(
+                    SizedBox::new(TextBox::multiline().lens(State::to_send))
+                        .height(100.0)
+                        .expand_width(),
+                )
+                .with_child(Button::new("Send").on_click(|_, data: &mut State, _| {
+                    let msg = mem::take(&mut data.to_send);
+                    data.messages.push_back(msg);
+                })),
             1.0,
         )
         .with_child(SizedBox::new(rectangle(Color::GREEN)).width(200.0))
-}
-
-fn messages<T: Data>() -> impl Widget<T> {
-    let mut result = Flex::column();
-    for _ in 0..10 {
-        result.add_child(SizedBox::new(rectangle(Color::SILVER)).height(30.0));
-        result.add_child(SizedBox::new(rectangle(Color::GRAY)).height(30.0));
-    }
-
-    result
 }
 
 fn rectangle<T: Data>(c: Color) -> impl Widget<T> {
