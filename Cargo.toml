@@ -4,3 +4,5 @@ members = [
 	'zdb',
 	'zrest'
 ]
+# OpenAPI gen for rust is broken, keep seperate
+exclude = ['zapi_gen']
