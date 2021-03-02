@@ -1,5 +1,9 @@
 #!/bin/bash
 
+set -ex
+
+rm zulip.yaml
+rm -rf zapi_gen
 cd openapi-generator
 ./mvnw package
 cd ..
