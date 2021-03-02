@@ -1,0 +1,137 @@
+# THIS IS HORIBLE, I DONT WANT TO TOUCH IT
+# but it should be cleaned up some day
+
+# From https://git.io/JfPqu
+
+name: build
+
+on: [push, pull_request]
+
+jobs:
+
+  #############
+  # BUILD JOB #
+  #############
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        rust: [stable, beta, nightly]
+    steps:
+    
+    # Get rust
+    - uses: hecrj/setup-rust-action@v1
+      with:
+        rust-version: ${{ matrix.rust }}
+
+    # Clone The reop
+    - uses: actions/checkout@v1
+    # File has unexpected size (1147 != 1124). Mirror sync in progress? [IP: 172.217.0.14 80]
+    # https://github.com/actions/virtual-environments/issues/323
+    # https://github.community/t/file-has-unexpected-size-89974-89668-mirror-sync-in-progress/17450
+    - name: Remove broken apt repos [Ubuntu]
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        for apt_file in `grep -lr microsoft /etc/apt/sources.list.d/`; do sudo rm $apt_file; done 
+    
+    - name: install libgtk-3-dev libx11-dev
+      run: |
+        sudo apt update
+        sudo apt install libgtk-3-dev libx11-dev
+      if: contains(matrix.os, 'ubuntu')
+
+    - name: Cache cargo registry
+      uses: actions/cache@v1
+      with:
+        path: ~/.cargo/registry
+        key: ${{ runner.os }}-cargo-registry-${{ hashFiles('Cargo.lock') }}
+    - name: Cache cargo index
+      uses: actions/cache@v1
+      with:
+        path: ~/.cargo/git
+        key: ${{ runner.os }}-cargo-index-${{ hashFiles('Cargo.lock') }}
+    - name: Build
+      run: cargo build
+    - name: Run tests
+      run: cargo test
+
+
+
+  clippy:
+    name: clippy (ubuntu-latest, stable)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hecrj/setup-rust-action@v1
+        with:
+          rust-version: stable
+          components: clippy
+      - name: Remove broken apt repos [Ubuntu]
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          for apt_file in `grep -lr microsoft /etc/apt/sources.list.d/`; do sudo rm $apt_file; done
+      - name: Checkout sources
+        uses: actions/checkout@v1
+      - name: install libgtk-3-dev libx11-dev
+        run: |
+          sudo apt update
+          sudo apt install libgtk-3-dev libx11-dev
+      - name: Cache cargo registry
+        uses: actions/cache@v1
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('Cargo.lock') }}
+      - name: Cache cargo index
+        uses: actions/cache@v1
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('Cargo.lock') }}
+      - name: Cache cargo build
+        uses: actions/cache@v1
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('Cargo.lock') }}
+      - name: Cargo Clippy
+        run: cargo clippy -- -D warnings -A deprecated
+
+  fmt:
+    name: fmt (ubuntu-latest, stable)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hecrj/setup-rust-action@v1
+        with:
+          rust-version: stable
+          components: rustfmt
+      - name: Checkout sources
+        uses: actions/checkout@v1
+      - name: Check Formatting
+        run: cargo fmt --all -- --check
+  miri:
+    name: miri (ubuntu, nightly)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dir: [wingspan, wingspan-buffer]
+    steps: 
+      - name: checkout
+        uses: actions/checkout@v1
+      - name: rustup
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: true
+          components: miri
+      - name: Remove broken apt repos [Ubuntu]
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          for apt_file in `grep -lr microsoft /etc/apt/sources.list.d/`; do sudo rm $apt_file; done
+      - name: install libgtk-3-dev libx11-dev
+        run: |
+          sudo apt update
+          sudo apt install libgtk-3-dev libx11-dev  
+      - name: Run Miri
+        run: |
+          cd ${{ matrix.dir }}
+          cargo miri setup
+          cargo miri test 
