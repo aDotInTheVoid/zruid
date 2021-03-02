@@ -1,3 +1,5 @@
+mod errors;
+
 pub struct Client {
     http: reqwest::Client,
     email: String,
