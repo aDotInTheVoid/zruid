@@ -36,7 +36,8 @@ fn build_root_widget() -> impl Widget<State> {
                         Label::new(|a: &String, _: &_| a.to_owned()).expand_width()
                     }))
                     .vertical()
-                    .lens(State::messages),
+                    .lens(State::messages)
+                    .expand_height(),
                     1.0,
                 )
                 .with_child(
