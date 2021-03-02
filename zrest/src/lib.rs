@@ -22,9 +22,7 @@ impl Client {
     ///
     /// [Zulip docs](https://zulip.com/api/send-message)
     pub async fn send(&self, content: &str) -> HResult<String> {
-        self.http
-            .post(&format!("{}/messages", self.server))
-            .basic_auth(&self.email, Some(&self.api_key))
+        self.post("messages")
             .form(&[
                 ("type", "private"),
                 // AARON id
@@ -38,14 +36,23 @@ impl Client {
             .await
     }
 
+    // Maily to debug for getting ids
     pub async fn users(&self) -> HResult<String> {
+        self.get("users").send().await?.text().await
+    }
+
+    fn request(&self, method: reqwest::Method, url: &str) -> reqwest::RequestBuilder {
         self.http
-            .get(&format!("{}/users", self.server))
+            .request(method, &format!("{}/{}", self.server, url))
             .basic_auth(&self.email, Some(&self.api_key))
-            .send()
-            .await?
-            .text()
-            .await
+    }
+
+    fn get(&self, url: &str) -> reqwest::RequestBuilder {
+        self.request(reqwest::Method::GET, url)
+    }
+
+    fn post(&self, url: &str) -> reqwest::RequestBuilder {
+        self.request(reqwest::Method::POST, url)
     }
 }
 
