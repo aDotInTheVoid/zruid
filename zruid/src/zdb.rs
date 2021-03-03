@@ -17,6 +17,7 @@ pub struct State {
 #[derive(Debug, Clone, PartialEq, druid::Data, druid::Lens, Hash, Eq)]
 pub struct Stream {
     pub id: u64,
+    pub name: String,
     pub topics: Vector<Topic>,
 }
 #[derive(Debug, Clone, PartialEq, druid::Data, druid::Lens, Hash, Eq)]
@@ -57,6 +58,7 @@ async fn get_state() -> State {
                     })
                     .collect(),
                 id: stream.stream_id,
+                name: stream.name,
             };
 
             // TODO: Use eyre
@@ -87,7 +89,7 @@ async fn get_state() -> State {
 
             topic_in.messages.push_back(Message {
                 content: i.content,
-                id: sid,
+                id: i.id,
                 from: i.sender_full_name,
             });
         }

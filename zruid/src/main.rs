@@ -64,16 +64,58 @@ impl TabsPolicy for TopicsTab {
     }
 }
 
+#[derive(Clone, Data)]
+struct StreamsTab;
+
+impl TabsPolicy for StreamsTab {
+    type Key = usize;
+    type Input = zdb::State;
+
+    type BodyWidget = Box<dyn Widget<Self::Input>>;
+    type LabelWidget = Label<Self::Input>;
+    type Build = ();
+
+    fn tabs_changed(&self, old_data: &Self::Input, data: &Self::Input) -> bool {
+        old_data == data
+    }
+
+    fn tabs(&self, data: &Self::Input) -> Vec<Self::Key> {
+        (0..data.streams.len()).collect()
+    }
+
+    fn tab_info(&self, key: Self::Key, data: &Self::Input) -> TabInfo<Self::Input> {
+        TabInfo::new(data.streams[key].name.clone(), false)
+    }
+
+    fn tab_body(&self, key: Self::Key, data: &Self::Input) -> Self::BodyWidget {
+        let w = stream_widget().lens(zdb::State::streams.then(Index::new(key)));
+        Box::new(w)
+    }
+
+    fn tab_label(
+        &self,
+        key: Self::Key,
+        info: TabInfo<Self::Input>,
+        data: &Self::Input,
+    ) -> Self::LabelWidget {
+        Self::default_make_label(info)
+    }
+}
+
 fn stream_widget() -> impl Widget<zdb::Stream> {
     Tabs::for_policy(TopicsTab)
 }
 
+fn server_widget() -> impl Widget<zdb::State> {
+    Tabs::for_policy(StreamsTab)
+}
+
 fn main() {
-    let main_window = WindowDesc::new(stream_widget)
+    let main_window = WindowDesc::new(server_widget)
         .title("Hello World!")
         .window_size((800.0, 400.0));
 
-    let state = zdb::state().streams[2].clone();
+    let state = zdb::state();
 
     AppLauncher::with_window(main_window)
         .launch(state)
