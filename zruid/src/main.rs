@@ -1,10 +1,13 @@
 use std::mem;
 
 use druid::im::Vector;
+use druid::lens::Index;
 use druid::widget::{
     Button, Flex, Label, List, Painter, Scroll, SizedBox, TabInfo, Tabs, TabsPolicy, TextBox,
 };
-use druid::{AppLauncher, Color, Data, Lens, RenderContext, Widget, WidgetExt, WindowDesc};
+use druid::{
+    AppLauncher, Color, Data, Lens, LensExt, RenderContext, Widget, WidgetExt, WindowDesc,
+};
 
 mod zdb;
 
@@ -25,7 +28,7 @@ fn topic_widget() -> impl Widget<zdb::Topic> {
 struct TopicsTab;
 
 impl TabsPolicy for TopicsTab {
-    type Key = String;
+    type Key = usize;
     type Input = zdb::Stream;
 
     type BodyWidget = Box<dyn Widget<Self::Input>>;
@@ -39,15 +42,16 @@ impl TabsPolicy for TopicsTab {
     }
 
     fn tabs(&self, data: &Self::Input) -> Vec<Self::Key> {
-        data.topics.iter().map(|x| x.name.clone()).collect()
+        (0..data.topics.len()).collect()
     }
 
     fn tab_info(&self, key: Self::Key, data: &Self::Input) -> druid::widget::TabInfo<Self::Input> {
-        TabInfo::new(format!("Tab {:?}", key), false)
+        TabInfo::new(data.topics[key].name.clone(), false)
     }
 
     fn tab_body(&self, key: Self::Key, data: &Self::Input) -> Self::BodyWidget {
-        Box::new(Label::new(format!("Dynamic tab body {:?}", key)))
+        let w = topic_widget().lens(zdb::Stream::topics.then(Index::new(key)));
+        Box::new(w)
     }
 
     fn tab_label(
@@ -69,7 +73,7 @@ fn main() {
         .title("Hello World!")
         .window_size((800.0, 400.0));
 
-    let state = zdb::state().streams[1].clone();
+    let state = zdb::state().streams[2].clone();
 
     AppLauncher::with_window(main_window)
         .launch(state)
