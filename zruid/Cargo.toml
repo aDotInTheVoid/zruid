@@ -8,3 +8,6 @@ edition = "2018"
 
 [dependencies]
 druid = { version = "0.7.0", features = ["im"] }
+futures = "0.3.13"
+zrest = { path = "../zrest" }
+tokio = { version = "1.2.0", features = ["rt-multi-thread"] }

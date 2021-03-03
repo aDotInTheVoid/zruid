@@ -4,6 +4,8 @@ use druid::im::{vector, Vector};
 use druid::widget::{Button, Flex, Label, List, Painter, Scroll, SizedBox, TextBox};
 use druid::{AppLauncher, Color, Data, Lens, RenderContext, Widget, WidgetExt, WindowDesc};
 
+mod zdb;
+
 #[derive(Clone, Data, Lens)]
 struct State {
     to_send: String,
@@ -11,18 +13,22 @@ struct State {
 }
 
 fn main() {
-    let main_window = WindowDesc::new(build_root_widget)
-        .title("Hello World!")
-        .window_size((800.0, 400.0));
+    // let main_window = WindowDesc::new(build_root_widget)
+    //     .title("Hello World!")
+    //     .window_size((800.0, 400.0));
 
-    let state = State {
-        to_send: String::new(),
-        messages: vector![],
-    };
+    // let state = State {
+    //     to_send: String::new(),
+    //     messages: vector![],
+    // };
 
-    AppLauncher::with_window(main_window)
-        .launch(state)
-        .expect("Failed to launch");
+    // AppLauncher::with_window(main_window)
+    //     .launch(state)
+    //     .expect("Failed to launch");
+    println!("START");
+    let s = zdb::state();
+    dbg!(s);
+    println!("END");
 }
 
 fn build_root_widget() -> impl Widget<State> {

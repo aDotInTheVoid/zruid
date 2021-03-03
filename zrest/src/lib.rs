@@ -13,11 +13,13 @@ pub struct Client {
 type HResult<T> = reqwest::Result<T>;
 
 #[derive(Debug, Serialize, Deserialize)]
+#[cfg_attr(druid, derive(druid::Data, druid::Lens))]
 pub struct Streams {
     pub streams: Vec<Stream>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[cfg_attr(druid, derive(druid::Data, druid::Lens))]
 /// <https://zulip.com/api/get-streams>
 pub struct Stream {
     pub stream_id: u64,
@@ -29,60 +31,63 @@ pub struct Stream {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[cfg_attr(druid, derive(druid::Data, druid::Lens))]
 pub struct Topic {
     pub max_id: u64,
     pub name: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[cfg_attr(druid, derive(druid::Data, druid::Lens))]
 pub struct Topics {
     pub topics: Vec<Topic>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[cfg_attr(druid, derive(druid::Data, druid::Lens))]
 pub struct Messages {
-    found_newest: bool,
-    found_oldest: bool,
-    found_anchor: bool,
-    history_limited: bool,
-    messages: Vec<Message>,
+    pub found_newest: bool,
+    pub found_oldest: bool,
+    pub found_anchor: bool,
+    pub history_limited: bool,
+    pub messages: Vec<Message>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Message {
-    avatar_url: Option<String>,
-    client: String,
-    content: String,
-    id: u64,
-    is_me_message: bool,
-    reactions: Vec<Reaction>,
-    recipient_id: u64,
-    sender_email: String,
-    sender_full_name: String,
-    sender_id: u64,
-    sender_realm_str: String,
-    stream_id: Option<u64>,
+pub struct Message {
+    pub avatar_url: Option<String>,
+    pub client: String,
+    pub content: String,
+    pub id: u64,
+    pub is_me_message: bool,
+    pub reactions: Vec<Reaction>,
+    pub recipient_id: u64,
+    pub sender_email: String,
+    pub sender_full_name: String,
+    pub sender_id: u64,
+    pub sender_realm_str: String,
+    pub stream_id: Option<u64>,
     #[serde(rename = "subject")]
-    topic: String,
-    timestamp: u64,
+    pub topic: String,
+    pub timestamp: u64,
     #[serde(rename = "type")]
-    message_type: MessageType,
-    flags: Flags,
-    last_edit_timestamp: Option<u64>,
+    pub message_type: MessageType,
+    pub flags: Flags,
+    pub last_edit_timestamp: Option<u64>,
 }
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
-enum MessageType {
+pub enum MessageType {
     Stream,
     Private,
 }
 #[derive(Debug, Serialize, Deserialize)]
-struct Reaction {
+pub struct Reaction {
     // TODO https://zulip.com/api/get-messages
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Flags(
+pub struct Flags(
     // TODO https://zulip.com/api/get-messages
     Vec<String>,
 );

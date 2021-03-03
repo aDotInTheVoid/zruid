@@ -1040,6 +1040,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "num_cpus"
+version = "1.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "05499f3756671c15885fee9034446956fff3f243d6077b91e5767df161f766b3"
+dependencies = [
+ "hermit-abi",
+ "libc",
+]
+
+[[package]]
 name = "objc"
 version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1819,6 +1829,7 @@ dependencies = [
  "libc",
  "memchr",
  "mio",
+ "num_cpus",
  "pin-project-lite",
  "tokio-macros",
 ]
@@ -2203,6 +2214,7 @@ version = "0.1.0"
 name = "zrest"
 version = "0.1.0"
 dependencies = [
+ "druid",
  "reqwest",
  "serde",
  "serde_json",
@@ -2214,4 +2226,7 @@ name = "zruid"
 version = "0.1.0"
 dependencies = [
  "druid",
+ "futures",
+ "tokio",
+ "zrest",
 ]
