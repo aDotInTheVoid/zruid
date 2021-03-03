@@ -8,25 +8,27 @@ const ZOE_API_KEY: &str = "XNKVLPJXdCHDp2WcXBGHWtAVAYjZIMVJ";
 const ZOE_EMAIL: &str = "ZOE@zulip.com";
 const DEV_SERVER: &str = "localhost:9991";
 
-#[derive(Debug, Clone, PartialEq)]
+use druid::im::Vector;
+
+#[derive(Debug, Clone, PartialEq, druid::Data, druid::Lens, Hash, Eq)]
 pub struct State {
-    streams: Vec<Stream>,
+    pub streams: Vector<Stream>,
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, druid::Data, druid::Lens, Hash, Eq)]
 pub struct Stream {
-    id: u64,
-    topics: Vec<Topic>,
+    pub id: u64,
+    pub topics: Vector<Topic>,
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, druid::Data, druid::Lens, Hash, Eq)]
 pub struct Topic {
-    name: String,
-    messages: Vec<Message>,
+    pub name: String,
+    pub messages: Vector<Message>,
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, druid::Data, druid::Lens, Hash, Eq)]
 pub struct Message {
-    from: String,
-    content: String,
-    id: u64,
+    pub from: String,
+    pub content: String,
+    pub id: u64,
 }
 
 // Spin up a RT to get the state
@@ -50,7 +52,7 @@ async fn get_state() -> State {
                 topics: topics
                     .into_iter()
                     .map(|t| Topic {
-                        messages: Vec::new(),
+                        messages: Vector::new(),
                         name: t.name,
                     })
                     .collect(),
@@ -71,7 +73,7 @@ async fn get_state() -> State {
     let mut streams = streams
         .into_iter()
         .map(|x| x.unwrap().unwrap())
-        .collect::<Vec<_>>();
+        .collect::<Vector<_>>();
 
     for i in messages.unwrap().messages {
         // FIXME: Dont ignore DMs
@@ -83,7 +85,7 @@ async fn get_state() -> State {
                 .find(|t| t.name == i.topic)
                 .unwrap();
 
-            topic_in.messages.push(Message {
+            topic_in.messages.push_back(Message {
                 content: i.content,
                 id: sid,
                 from: i.sender_full_name,
