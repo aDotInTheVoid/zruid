@@ -1,7 +1,7 @@
 use druid::im::Vector;
 use druid::lens::Index;
 use druid::widget::{Label, List, Scroll, TabInfo, Tabs, TabsPolicy};
-use druid::{AppLauncher, Data, Lens, LensExt, Widget, WidgetExt, WindowDesc};
+use druid::{AppLauncher, Data, Lens, LensExt, Vec2, Widget, WidgetExt, WindowDesc};
 
 mod zdb;
 
@@ -13,10 +13,16 @@ struct State {
 
 fn message_widget() -> impl Widget<zdb::Message> {
     Label::new(|data: &zdb::Message, _: &_| format!("From {}: {}", data.from, data.content))
+        .with_line_break_mode(druid::widget::LineBreaking::WordWrap)
 }
 
 fn topic_widget() -> impl Widget<zdb::Topic> {
-    Scroll::new(List::new(message_widget).lens(zdb::Topic::messages)).vertical()
+    let mut x = Scroll::new(List::new(message_widget).lens(zdb::Topic::messages)).vertical();
+    // x.scroll_by(Vec2 {
+    //     x: 0.0,
+    //     y: 10000000.0
+    // });
+    x
 }
 #[derive(Clone, Data)]
 struct TopicsTab;
