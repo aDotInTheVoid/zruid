@@ -92,6 +92,12 @@ pub struct Flags(
     Vec<String>,
 );
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DevApiKeys {
+    api_key: String,
+    email: String,
+}
+
 impl Client {
     pub fn new(email: &str, api_key: &str, server: &str) -> Self {
         Self {
@@ -100,6 +106,22 @@ impl Client {
             api_key: api_key.to_owned(),
             server: format!("{}/api/v1", server),
         }
+    }
+
+    pub async fn from_dev_server(email: &str, server: &str) -> HResult<Self> {
+        let http = reqwest::Client::new();
+        let creds: DevApiKeys = http.post(&format!("{}/api/v1/dev_fetch_api_key", server))
+            .form(&[("username", email)])
+            .send().await?.json().await?;
+
+        assert_eq!(&creds.email, email);
+        
+        Ok(Self {
+            http,
+            api_key: creds.api_key,
+            email: creds.email,
+            server: format!("{}/api/v1", server),
+        })
     }
 
     // TODO: Add these again with types
@@ -172,6 +194,8 @@ impl Client {
             .await
     }
 
+    
+
     fn request(&self, method: reqwest::Method, url: &str) -> reqwest::RequestBuilder {
         self.http
             .request(method, &format!("{}/{}", self.server, url))
@@ -189,8 +213,29 @@ impl Client {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn it_works() {
         assert_eq!(2 + 2, 4);
     }
+
+    #[tokio::test]
+    async fn loads() {
+        let c = Client::from_dev_server("ZOE@zulip.com", "http://localhost:9991").await.unwrap();
+
+        let ms = c.messages().await.unwrap();
+        insta::assert_yaml_snapshot!(ms);
+
+        let st = c.streams().await.unwrap();
+        insta::assert_yaml_snapshot!(st);
+
+        for i in st.streams {
+            let id = i.stream_id;
+            let topics = c.topics(id).await.unwrap();
+            insta::assert_yaml_snapshot!(topics);
+        }
+
+    }
+
 }

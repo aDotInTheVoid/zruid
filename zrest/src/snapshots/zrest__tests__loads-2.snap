@@ -1,0 +1,91 @@
+---
+source: zrest/src/lib.rs
+expression: st
+
+---
+streams:
+  - stream_id: 1
+    name: Denmark
+    description: A Scandinavian country
+    date_created: 1614891892
+    is_web_public: false
+    invite_only: false
+  - stream_id: 2
+    name: Rome
+    description: Yet another Italian city
+    date_created: 1614891892
+    is_web_public: true
+    invite_only: false
+  - stream_id: 3
+    name: Scotland
+    description: Located in the United Kingdom
+    date_created: 1614891892
+    is_web_public: false
+    invite_only: false
+  - stream_id: 4
+    name: Venice
+    description: A northeastern Italian city
+    date_created: 1614891892
+    is_web_public: false
+    invite_only: false
+  - stream_id: 5
+    name: Verona
+    description: A city in Italy
+    date_created: 1614891892
+    is_web_public: false
+    invite_only: false
+  - stream_id: 6
+    name: all
+    description: For **everything**
+    date_created: 1614891892
+    is_web_public: false
+    invite_only: false
+  - stream_id: 7
+    name: announce
+    description: For announcements
+    date_created: 1614891892
+    is_web_public: false
+    invite_only: false
+  - stream_id: 8
+    name: design
+    description: For design
+    date_created: 1614891892
+    is_web_public: false
+    invite_only: false
+  - stream_id: 9
+    name: devel
+    description: For developing
+    date_created: 1614891892
+    is_web_public: false
+    invite_only: false
+  - stream_id: 10
+    name: errors
+    description: For errors
+    date_created: 1614891892
+    is_web_public: false
+    invite_only: false
+  - stream_id: 11
+    name: sales
+    description: For sales discussion
+    date_created: 1614891892
+    is_web_public: false
+    invite_only: false
+  - stream_id: 12
+    name: social
+    description: For socializing
+    date_created: 1614891892
+    is_web_public: false
+    invite_only: false
+  - stream_id: 13
+    name: support
+    description: For support
+    date_created: 1614891892
+    is_web_public: false
+    invite_only: false
+  - stream_id: 14
+    name: test
+    description: "For testing `code`"
+    date_created: 1614891892
+    is_web_public: false
+    invite_only: false
+
