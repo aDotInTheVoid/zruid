@@ -1,3 +1,4 @@
+use std::env;
 use std::sync::Arc;
 
 use futures::future::{join, join_all};
@@ -39,7 +40,11 @@ pub fn state() -> State {
 }
 
 async fn get_state() -> State {
-    let c = zrest::Client::new(ZOE_EMAIL, ZOE_API_KEY, DEV_SERVER);
+    let email = env::var("ZERVER_EMAIL").unwrap();
+    let key = env::var("ZERVER_KEY").unwrap();
+    let server = env::var("ZERVER_SERVER").unwrap();
+
+    let c = zrest::Client::new(&email, &key, &server);
     let c = Arc::new(c);
 
     let streams = c.streams().await.unwrap().streams;

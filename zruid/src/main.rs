@@ -1,6 +1,6 @@
 use druid::im::Vector;
 use druid::lens::Index;
-use druid::widget::{Label, List, TabInfo, Tabs, TabsPolicy};
+use druid::widget::{Label, List, Scroll, TabInfo, Tabs, TabsPolicy};
 use druid::{AppLauncher, Data, Lens, LensExt, Widget, WidgetExt, WindowDesc};
 
 mod zdb;
@@ -16,7 +16,7 @@ fn message_widget() -> impl Widget<zdb::Message> {
 }
 
 fn topic_widget() -> impl Widget<zdb::Topic> {
-    List::new(message_widget).lens(zdb::Topic::messages)
+    Scroll::new(List::new(message_widget).lens(zdb::Topic::messages)).vertical()
 }
 #[derive(Clone, Data)]
 struct TopicsTab;

@@ -98,7 +98,7 @@ impl Client {
             http: reqwest::Client::new(),
             email: email.to_owned(),
             api_key: api_key.to_owned(),
-            server: format!("http://{}/api/v1", server),
+            server: format!("{}/api/v1", server),
         }
     }
 
